@@ -1,12 +1,10 @@
 package com.github.jmir1.aniparseandroid.app
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.github.jmir1.aniparseandroid.app.databinding.ActivityMainBinding
-import com.github.jmir1.aniparseandroid.library.FactorialCalculator
 import com.github.jmir1.aniparseandroid.library.android.NotificationUtil
 import java.lang.IllegalStateException
 
@@ -24,7 +22,7 @@ class MainActivity : AppCompatActivity() {
             if (binding.editTextFactorial.text.isNotEmpty()) {
                 val input = binding.editTextFactorial.text.toString().toLong()
                 val result = try {
-                    FactorialCalculator.computeFactorial(input).toString()
+                    input.toString()
                 } catch (ex: IllegalStateException) {
                     "Error: ${ex.message}"
                 }
@@ -39,11 +37,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Please enter a number", Toast.LENGTH_SHORT).show()
             }
-        }
-
-        binding.buttonAppcompose.setOnClickListener {
-            val intent = Intent(it.context, ComposeActivity::class.java)
-            startActivity(intent)
         }
     }
 }
