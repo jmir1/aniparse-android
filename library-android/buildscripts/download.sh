@@ -1,22 +1,14 @@
 #!/bin/bash -e
 
-v_sdk=8512546_latest
-v_ndk=r25b
-v_ndk_n=25.1.8937393
-v_sdk_build_tools=30.0.3
-v_target_sdk=33
-v_minimum_sdk=21
-
-pkg_reqs="build-essential ccache git zlib1g-dev python3 python3-dev \
-libncurses5:i386 libstdc++6:i386 zlib1g:i386 openjdk-8-jdk unzip ant \
-ccache autoconf libtool libssl-dev libffi-dev"
+. ./include.sh
 
 [ -z "$WGET" ] && WGET=wget # possibility of calling wget differently
 
 sudo dpkg --add-architecture i386
 sudo apt update
-sudo apt install $pkg_reqs
-sudo pip3 install git+https://github.com/kivy/python-for-android.git
+echo y | sudo apt install $pkg_reqs
+pip3 install "python-for-android==${v_p4a}"
+pip3 install Cython
 
 if ! javac -version &>/dev/null; then
   echo "Error: missing Java Development Kit."
@@ -31,9 +23,13 @@ mkdir -p sdk && cd sdk
 # Android SDK
 if [ ! -d "android-sdk-linux" ]; then
 	$WGET "https://dl.google.com/android/repository/commandlinetools-linux-${v_sdk}.zip"
-	mkdir "android-sdk-linux"
-	unzip -q -d "android-sdk-linux" "commandlinetools-linux-${v_sdk}.zip"
+	mkdir -p "android-sdk-linux/cmdline-tools/latest"
+	unzip -q -d "android-sdk-linux/cmdline-tools" "commandlinetools-linux-${v_sdk}.zip"
 	rm "commandlinetools-linux-${v_sdk}.zip"
+	shopt -s dotglob
+	mv android-sdk-linux/cmdline-tools/cmdline-tools/* android-sdk-linux/cmdline-tools/latest/
+	shopt -u dotglob
+	rm -d android-sdk-linux/cmdline-tools/cmdline-tools
 fi
 sdkmanager () {
 	local exe="./android-sdk-linux/cmdline-tools/latest/bin/sdkmanager"
@@ -41,7 +37,8 @@ sdkmanager () {
 	"$exe" --sdk_root="${ANDROID_HOME}" "$@"
 }
 echo y | sdkmanager \
-	"platforms;android-32" "build-tools;${v_sdk_build_tools}" \
+	"platforms;android-${v_target_sdk}" "build-tools;${v_sdk_build_tools}" \
+	"ndk;${v_ndk_n}" \
 	"extras;android;m2repository"
 
 # Android NDK (either standalone or installed by SDK)
@@ -61,8 +58,3 @@ if ! grep -qF "${v_ndk_n}" "android-ndk-${v_ndk}/source.properties"; then
 	echo "Error: NDK exists but is not the correct version (expecting ${v_ndk_n})"
 	exit 255
 fi
-
-export ANDROIDSDK="./android-sdk-linux"
-export ANDROIDNDK="$ANDROIDSDK/ndk/${v_ndk_n}"
-export ANDROIDAPI="$v_target_sdk"
-export NDKAPI="$v_minimum_sdk"

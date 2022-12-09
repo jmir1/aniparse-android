@@ -19,9 +19,11 @@ android {
         consumerProguardFiles("consumer-rules.pro")
 
         ndk {
-            abiFilters += listOf("x86_64")
+            abiFilters += listOf("x86_64", "arm64-v8a")
         }
     }
+
+    ndkVersion = "25.1.8937393"
 
     externalNativeBuild {
         ndkBuild {

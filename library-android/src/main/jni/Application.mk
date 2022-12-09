@@ -1,2 +1,2 @@
-APP_ABI := x86_64
+APP_ABI := all
 APP_PLATFORM := android-21
