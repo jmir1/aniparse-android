@@ -34,4 +34,5 @@ jobs:
       - name: Run Gradle
         env:
           ANDROID_HOME: 'library-android/buildscripts/sdk/android-sdk-linux'
+          ANDROID_SDK_ROOT: 'library-android/buildscripts/sdk/android-sdk-linux'
         run: ./gradlew build check publishToMavenLocal --continue
