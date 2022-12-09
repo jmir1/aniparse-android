@@ -5,14 +5,14 @@
 [ -z "$WGET" ] && WGET=wget # possibility of calling wget differently
 
 sudo dpkg --add-architecture i386
-sudo apt update
-echo y | sudo apt install $pkg_reqs
+sudo apt-get update
+echo y | sudo apt-get install $pkg_reqs
 pip3 install "python-for-android==${v_p4a}"
 pip3 install Cython
 
 if ! javac -version &>/dev/null; then
   echo "Error: missing Java Development Kit."
-  echo "Install it using e.g. sudo apt install default-jre-headless"
+  echo "Install it using e.g. sudo apt-get install default-jre-headless"
   exit 255
 fi
 
