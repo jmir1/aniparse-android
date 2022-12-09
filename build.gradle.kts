@@ -15,6 +15,7 @@ allprojects {
 
 val ktlintVersion = libs.versions.ktlint.asProvider().get()
 val detektFormatting = libs.detekt.formatting
+val detektRulesLibraries = libs.detekt.rules.libraries
 
 subprojects {
     apply {
@@ -27,6 +28,7 @@ subprojects {
 
     dependencies {
         detektPlugins(detektFormatting)
+        detektPlugins(detektRulesLibraries)
     }
 }
 

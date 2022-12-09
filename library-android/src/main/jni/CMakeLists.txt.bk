@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 2.8.10)
+project(aniparse-android)
+
+set(PYTHON_FOR_ANDROID_PATH ${CMAKE_CURRENT_LIST_DIR}/../../../python-for-android)
+set(GUEST_PYTHON_PATH ${PYTHON_FOR_ANDROID_PATH}/build/other_builds/python3)
+set(PYTHON_PATH ${GUEST_PYTHON_PATH}/x86_64__ndk_target_21/python3)
+
+#add libpython
+add_library(lib_python3.9 SHARED IMPORTED)
+set_target_properties(lib_python3.9 PROPERTIES IMPORTED_LOCATION
+        ${PYTHON_PATH}/android-build/libpython3.9.so)
+
+# add libaniparse
+add_library(aniparse SHARED pybridge.c)
+
+target_include_directories(aniparse PRIVATE  ${PYTHON_PATH}/Include)
+
+#link with libpython
+target_link_libraries(aniparse
+        android
+        log
+        -lpython3.9 -L${PYTHON_PATH}/android-build
+        )

@@ -37,6 +37,7 @@ compose_ui_tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = 
 compose_ui_test_junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
 compose_ui_test_manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose" }
 detekt_formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+detekt_rules_libraries = { module = "io.gitlab.arturbosch.detekt:detekt-rules-libraries", version.ref = "detekt" }
 espresso_core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso.core" }
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
