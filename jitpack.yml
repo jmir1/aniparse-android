@@ -1,0 +1,8 @@
+before_install:
+   - cd library-android/buildscripts
+   - ./download.sh
+   - ./build_python.sh
+   - cd ../..
+env:
+  ANDROID_HOME: "library-android/buildscripts/sdk/android-sdk-linux"
+  ANDROID_SDK_ROOT: "library-android/buildscripts/sdk/android-sdk-linux"
