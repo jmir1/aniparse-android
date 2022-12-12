@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
             val input = binding.editTextFactorial.text.toString()
             val result = Parser.parse(input)
 
-            binding.textResult.text = result
+            result?.let { binding.textResult.text = it.animeTitle }
             binding.textResult.visibility = View.VISIBLE
         }
     }

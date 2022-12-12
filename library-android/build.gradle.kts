@@ -36,6 +36,7 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
+        freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
     }
 
     buildTypes {
@@ -64,6 +65,8 @@ android {
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.serialization.core)
 
     testImplementation(libs.junit)
 

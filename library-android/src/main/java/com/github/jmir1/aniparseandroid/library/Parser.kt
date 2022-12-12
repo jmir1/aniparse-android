@@ -2,9 +2,16 @@ package com.github.jmir1.aniparseandroid.library
 
 import android.content.Context
 import android.os.Build
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.decodeFromString
 
 class Parser {
     companion object {
+        /**
+         * Json serialization object
+         */
+        private val json = Json { ignoreUnknownKeys = true }
+
         /**
          * Whether the python interpreter is started or not
          */
@@ -56,10 +63,11 @@ class Parser {
          * @return The parsed result or null if there was an error
          * @throws [InterpreterException] if the interpreter isn't started
          */
-        fun parse(input: String): String? {
+        fun parse(input: String): AniparseResult? {
             if (!isStarted) throw InterpreterException()
             val jsonString = call("json.dumps(aniparse.parse('$input'))")
-            return jsonString
+                ?: return null
+            return json.decodeFromString<AniparseResult>(jsonString)
         }
 
         /**

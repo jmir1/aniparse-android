@@ -19,7 +19,6 @@ ktlint_gradle = "10.2.1"
 min_sdk_version = "21"
 target_sdk_version = "33"
 benmanesversion = "0.44.0"
-aniparse = "0.1"
 serialization_json = "1.4.1"
 
 [libraries]
@@ -45,8 +44,8 @@ agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kgp = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 dokka_gradle_plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka"}
 dokka_core = { module = "org.jetbrains.dokka:dokka-core", version.ref = "dokka"}
-aniparse_android = { module = "com.github.jmir1:aniparse-android", version.ref = "aniparse" }
 kotlin_serialization_json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization.json" }
+kotlin_serialization_core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "serialization.json" }
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
