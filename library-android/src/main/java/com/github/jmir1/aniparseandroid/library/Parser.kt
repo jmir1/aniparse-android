@@ -1,4 +1,7 @@
-package com.github.jmir1.aniparseandroid.library.android
+package com.github.jmir1.aniparseandroid.library
+
+import android.content.Context
+import android.os.Build
 
 class Parser {
     companion object {
@@ -10,11 +13,16 @@ class Parser {
         /**
          * Starts the python interpreter
          *
-         * @param path The location of the extracted python distribution
          * @return error code
          */
-        fun start(path: String): Int {
-            val returnCode = startExternal(path)
+        fun start(context: Context): Int {
+            val assetExtractor = AssetExtractor(context.applicationContext)
+            val abi = Build.SUPPORTED_ABIS.first()
+            val path = "python/$abi"
+            assetExtractor.removeAssets(path)
+            assetExtractor.copyAssets(path)
+            val pythonPath = assetExtractor.getAssetsDataDir() + path
+            val returnCode = startExternal(pythonPath)
             isStarted = returnCode == 0
             return returnCode
         }
@@ -45,12 +53,12 @@ class Parser {
          * Parse an anime filename
          *
          * @param input The filename to be parsed
-         * @return The parsed result
+         * @return The parsed result or null if there was an error
          * @throws [InterpreterException] if the interpreter isn't started
          */
-        fun parse(input: String): String {
+        fun parse(input: String): String? {
             if (!isStarted) throw InterpreterException()
-            return call("aniparse.parse('$input')") ?: "bruh"
+            return call("aniparse.parse('$input')")
         }
 
         /**

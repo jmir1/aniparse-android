@@ -22,15 +22,13 @@ PyObject *local_dict;
 /* ------------------ */
 
 /**
-    This function configures the location of the standard library,
-    initializes the interpreter and sets up the python log redirect.
-    It runs a file called bootstrap.py before returning, so make sure
-    that you configure all your python code on that file.
-    Note: the function must receives a string with the location of the
-    python files extracted from the assets folder.
+ * This function configures the location of the standard library and
+ * initializes the interpreter.
+ * Note: the function must receive a string with the location of the
+ * python files extracted from the assets folder.
 */
 JNIEXPORT jint JNICALL
-Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_startExternal(JNIEnv *env,
+Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_startExternal(JNIEnv *env,
                                                                                           jobject thiz,
                                                                                           jstring path)
 {
@@ -50,7 +48,6 @@ Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_star
 
     // Import modules
     PyRun_SimpleString("import aniparse");
-    PyRun_SimpleString("print('bruh')");
 
     // Initialize dicts for evaluating stuff
     main_module = PyImport_AddModule("__main__");
@@ -64,9 +61,11 @@ Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_star
     return 0;
 }
 
-
+/**
+ * This function stops the python interpreter and cleans up everything.
+ */
 JNIEXPORT jint JNICALL
-Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_stopExternal(JNIEnv *env,
+Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_stopExternal(JNIEnv *env,
                                                                                          jobject thiz)
 {
     Py_DECREF(local_dict);
@@ -78,20 +77,21 @@ Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_stop
 
 
 /**
-    This function is responsible for receiving a payload string
-    and sending it to the router function defined in the bootstrap.py
-    file.
-*/
+ * This function evaluates the given payload string and returns the
+ * result as a string representation or null if there is an error.
+ */
 JNIEXPORT jstring JNICALL
-Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_call(JNIEnv *env,
+Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_call(JNIEnv *env,
                                                                                  jobject thiz,
                                                                                  jstring payload)
 {
+    // Variables
     PyObject *codeObject;
     PyObject *resultObject;
     PyObject *resultPythonString;
     const char *resultString;
     jstring result;
+
     // Get the payload string
     jboolean iscopy;
     const char *payload_utf = (*env)->GetStringUTFChars(env, payload, &iscopy);

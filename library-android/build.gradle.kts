@@ -13,14 +13,10 @@ android {
     defaultConfig {
         minSdk = libs.versions.min.sdk.version.get().toInt()
         targetSdk = libs.versions.target.sdk.version.get().toInt()
-        namespace = "com.github.jmir1.aniparseandroid.library.android"
+        namespace = "com.github.jmir1.aniparseandroid.library"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
-
-        ndk {
-            abiFilters += listOf("x86_64", "arm64-v8a")
-        }
     }
 
     ndkVersion = "25.1.8937393"
@@ -28,6 +24,15 @@ android {
     externalNativeBuild {
         ndkBuild {
             path = file("src/main/jni/Android.mk")
+        }
+    }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+            isUniversalApk = true
         }
     }
 

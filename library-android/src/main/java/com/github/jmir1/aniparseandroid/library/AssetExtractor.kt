@@ -1,42 +1,18 @@
-package com.github.jmir1.aniparseandroid.library.android
+package com.github.jmir1.aniparseandroid.library
 
 import android.content.Context
 import android.content.res.AssetManager
-import android.preference.PreferenceManager
 import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.Locale
 
 
-class AssetExtractor(context: Context) {
+internal class AssetExtractor(context: Context) {
     private val mContext: Context = context
     private val mAssetManager: AssetManager = context.assets
-
-    /**
-     * Sets a version for the extracted assets version.
-     *
-     * @param version: int
-     */
-    fun setAssetsVersion(version: Int) {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(mContext)
-        val editor = preferences.edit()
-        editor.putInt("assetsVersion", version)
-        editor.apply()
-    }
-
-    /**
-     * Returns the version for the extracted assets.
-     *
-     * @return int
-     */
-    fun getAssetsVersion(): Int {
-        val preferences = PreferenceManager.getDefaultSharedPreferences(mContext)
-        return preferences.getInt("assetsVersion", 0)
-    }
 
     /**
      * Returns a list of assets in the APK.
@@ -44,11 +20,11 @@ class AssetExtractor(context: Context) {
      * @param path: the path in the assets folder.
      * @return the list of assets.
      */
-    fun listAssets(path: String): List<String> {
+    private fun listAssets(path: String): List<String> {
         val assets: MutableList<String> = ArrayList()
         try {
-            val assetList = mAssetManager.list(path)
-            if (assetList!!.isNotEmpty()) {
+            val assetList = mAssetManager.list(path) ?: emptyArray()
+            if (assetList.isNotEmpty()) {
                 for (asset in assetList) {
                     val subAssets = listAssets("$path/$asset")
                     assets.addAll(subAssets)
@@ -80,7 +56,6 @@ class AssetExtractor(context: Context) {
      */
     private fun copyAssetFile(src: String, dst: String) {
         val file = File(dst)
-        Log.i(LOGTAG, String.format(Locale.ENGLISH, "Copying %s -> %s", src, dst))
         try {
             val dir = file.parentFile!!
             if (!dir.exists()) {
@@ -121,7 +96,6 @@ class AssetExtractor(context: Context) {
         if (file.isDirectory) {
             for (f in file.listFiles()!!) recursiveDelete(f)
         }
-        Log.i(LOGTAG, "Removing " + file.absolutePath)
         file.delete()
     }
 
@@ -133,17 +107,6 @@ class AssetExtractor(context: Context) {
     fun removeAssets(path: String) {
         val file = File(getAssetsDataDir() + path)
         recursiveDelete(file)
-    }
-
-    /**
-     * Returns if the path exists in the device assets.
-     *
-     * @param path: the path to the assets folder
-     * @return Boolean
-     */
-    fun existsAssets(path: String): Boolean {
-        val file = File(getAssetsDataDir() + path)
-        return file.exists()
     }
 }
 

@@ -1,4 +1,4 @@
-package com.github.jmir1.aniparseandroid.library.android
+package com.github.jmir1.aniparseandroid.library
 
 import android.app.Notification
 import android.app.NotificationChannel
