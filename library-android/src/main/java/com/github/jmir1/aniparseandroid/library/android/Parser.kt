@@ -39,7 +39,7 @@ class Parser {
          *
          * @param payload
          */
-        private external fun call(payload: String): String
+        private external fun call(payload: String): String?
 
         /**
          * Parse an anime filename
@@ -50,22 +50,7 @@ class Parser {
          */
         fun parse(input: String): String {
             if (!isStarted) throw InterpreterException()
-            return call("aniparse.parse($input)")
-        }
-
-        /**
-         * Returns a greeting
-         *
-         * @return A greeting
-         * @throws [InterpreterException] if the interpreter isn't started
-         */
-        fun greet(): String {
-            if (!isStarted) throw InterpreterException()
-            return call("print('Hello World!')")
-        }
-
-        fun greetDumb(): String {
-            return "Bruh".toString()
+            return call("aniparse.parse('$input')") ?: "bruh"
         }
 
         /**

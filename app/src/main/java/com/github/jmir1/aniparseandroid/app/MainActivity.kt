@@ -1,5 +1,6 @@
 package com.github.jmir1.aniparseandroid.app
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,33 +21,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val assetExtractor = AssetExtractor(applicationContext)
+        val abi = Build.SUPPORTED_ABIS.first()
+        val path = "python/$abi"
+        assetExtractor.removeAssets(path)
+        assetExtractor.copyAssets(path)
+        val pythonPath = assetExtractor.getAssetsDataDir() + path
+        Parser.start(pythonPath)
 
         binding.buttonCompute.setOnClickListener {
-            val assetExtractor = AssetExtractor(applicationContext)
-            assetExtractor.removeAssets("python")
-            assetExtractor.copyAssets("python")
-            val pythonPath = assetExtractor.getAssetsDataDir() + "python"
-            val greeting = Parser.greetDumb()
-            Parser.start(pythonPath)
-            Log.i("bruh", greeting)
-            if (binding.editTextFactorial.text.isNotEmpty()) {
-                val input = binding.editTextFactorial.text.toString().toLong()
-                val result = try {
-                    input.toString()
-                } catch (ex: IllegalStateException) {
-                    "Error: ${ex.message}"
-                }
+            Parser.parse("[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon_[1280x720_H.264_FLAC][1234ABCD].mkv")
+            val input = binding.editTextFactorial.text.toString()
+            val result = Parser.parse(input)
 
-                binding.textResult.text = result
-                binding.textResult.visibility = View.VISIBLE
-                notificationUtil.showNotification(
-                    context = this,
-                    title = getString(R.string.notification_title),
-                    message = result
-                )
-            } else {
-                Toast.makeText(this, "Please enter a number", Toast.LENGTH_SHORT).show()
-            }
+            binding.textResult.text = result
+            binding.textResult.visibility = View.VISIBLE
+            notificationUtil.showNotification(
+                context = this,
+                title = getString(R.string.notification_title),
+                message = result
+            )
         }
+    }
+
+    override fun onDestroy() {
+        Parser.stop()
+        super.onDestroy()
     }
 }

@@ -8,69 +8,14 @@
 
 #include <Python.h>
 #include <jni.h>
-#include <android/log.h>
 
-#define LOG(x) __android_log_write(ANDROID_LOG_INFO, "pybridge", (x))
+/* ------------------ */
+/*  Global variables  */
+/* ------------------ */
 
-
-/* --------------- */
-/*   Android log   */
-/* --------------- */
-
-static PyObject *androidlog(PyObject *self, PyObject *args)
-{
-    char *str;
-    if (!PyArg_ParseTuple(args, "s", &str))
-        return NULL;
-
-    LOG(str);
-    Py_RETURN_NONE;
-}
-
-
-static PyMethodDef AndroidlogMethods[] = {
-        {"log", androidlog, METH_VARARGS, "Logs to Android stdout"},
-        {NULL, NULL, 0, NULL}
-};
-
-
-static struct PyModuleDef AndroidlogModule = {
-        PyModuleDef_HEAD_INIT,
-        "androidlog",        /* m_name */
-        "Log for Android",   /* m_doc */
-        -1,                  /* m_size */
-        AndroidlogMethods    /* m_methods */
-};
-
-
-PyMODINIT_FUNC PyInit_androidlog(void)
-{
-    return PyModule_Create(&AndroidlogModule);
-}
-
-
-void setAndroidLog()
-{
-    // Inject  bootstrap code to redirect python stdin/stdout
-    // to the androidlog module
-    PyRun_SimpleString(
-            "import sys\n" \
-            "import androidlog\n" \
-            "class LogFile(object):\n" \
-            "    def __init__(self):\n" \
-            "        self.buffer = ''\n" \
-            "    def write(self, s):\n" \
-            "        s = self.buffer + s\n" \
-            "        lines = s.split(\"\\n\")\n" \
-            "        for l in lines[:-1]:\n" \
-            "            androidlog.log(l)\n" \
-            "        self.buffer = lines[-1]\n" \
-            "    def flush(self):\n" \
-            "        return\n" \
-            "sys.stdout = sys.stderr = LogFile()\n"
-    );
-}
-
+PyObject *main_module;
+PyObject *global_dict;
+PyObject *local_dict;
 
 /* ------------------ */
 /*   Native methods   */
@@ -89,26 +34,28 @@ Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_star
                                                                                           jobject thiz,
                                                                                           jstring path)
 {
-    LOG("Initializing the Python interpreter");
-
     // Get the location of the python files
     const char *pypath = (*env)->GetStringUTFChars(env, path, NULL);
 
     // Build paths for the Python interpreter
     char paths[512];
-    snprintf(paths, sizeof(paths), "%s:%s/stdlib.zip:%s/modules", pypath, pypath, pypath);
+    snprintf(paths, sizeof(paths), "%s:%s/stdlib.zip:%s/modules:%s/site-packages", pypath, pypath, pypath, pypath);
 
     // Set Python paths
     wchar_t *wchar_paths = Py_DecodeLocale(paths, NULL);
     Py_SetPath(wchar_paths);
 
     // Initialize Python interpreter and logging
-    PyImport_AppendInittab("androidlog", PyInit_androidlog);
     Py_InitializeEx(0);
-    setAndroidLog();
 
-    // Bootstrap
-    PyRun_SimpleString("import bootstrap");
+    // Import modules
+    PyRun_SimpleString("import aniparse");
+    PyRun_SimpleString("print('bruh')");
+
+    // Initialize dicts for evaluating stuff
+    main_module = PyImport_AddModule("__main__");
+    global_dict = PyModule_GetDict(main_module);
+    local_dict = PyDict_New();
 
     // Cleanup
     (*env)->ReleaseStringUTFChars(env, path, pypath);
@@ -122,7 +69,9 @@ JNIEXPORT jint JNICALL
 Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_stopExternal(JNIEnv *env,
                                                                                          jobject thiz)
 {
-    LOG("Finalizing the Python interpreter");
+    Py_DECREF(local_dict);
+    Py_DECREF(global_dict);
+    Py_DECREF(main_module);
     Py_Finalize();
     return 0;
 }
@@ -138,34 +87,32 @@ Java_com_github_jmir1_aniparseandroid_library_android_Parser_00024Companion_call
                                                                                  jobject thiz,
                                                                                  jstring payload)
 {
-    LOG("Call into Python interpreter");
-
+    PyObject *codeObject;
+    PyObject *resultObject;
+    PyObject *resultPythonString;
+    const char *resultString;
+    jstring result;
     // Get the payload string
     jboolean iscopy;
     const char *payload_utf = (*env)->GetStringUTFChars(env, payload, &iscopy);
 
-    // Import module
-    PyObject* myModuleString = PyUnicode_FromString((char*)"bootstrap");
-    PyObject* myModule = PyImport_Import(myModuleString);
-
-    // Get reference to the router function
-    PyObject* myFunction = PyObject_GetAttrString(myModule, (char*)"router");
-    PyObject* args = PyTuple_Pack(1, PyUnicode_FromString(payload_utf));
-
-    // Call function and get the resulting string
-    PyObject* myResult = PyObject_CallObject(myFunction, args);
-    const char *myResultChar = PyUnicode_AsUTF8(myResult);
+    // Compile the payload and evaluate it
+    codeObject = Py_CompileString(payload_utf, "", Py_eval_input);
+    if (codeObject)
+        resultObject = PyEval_EvalCode(codeObject, global_dict, local_dict);
+    if (resultObject)
+        resultPythonString = PyObject_Str(resultObject);
+    if (resultPythonString)
+        resultString = PyUnicode_AsUTF8(resultPythonString);
 
     // Store the result on a java.lang.String object
-    jstring result = (*env)->NewStringUTF(env, myResultChar);
+    result = (*env)->NewStringUTF(env, resultString);
 
     // Cleanup
     (*env)->ReleaseStringUTFChars(env, payload, payload_utf);
-    Py_DECREF(myModuleString);
-    Py_DECREF(myModule);
-    Py_DECREF(myFunction);
-    Py_DECREF(args);
-    Py_DECREF(myResult);
+    Py_XDECREF(codeObject);
+    Py_XDECREF(resultObject);
+    Py_XDECREF(resultPythonString);
 
     return result;
 }

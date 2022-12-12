@@ -39,4 +39,5 @@ for arch in $ARCHS; do
     cp -r "$P4A_BUILD_DIR/Include" "../py-includes/$arch"
     cp "$P4A_DIST_DIR/stdlib.zip" "../src/main/assets/python/${arch}/stdlib.zip"
     cp -r "$P4A_DIST_DIR/modules" "../src/main/assets/python/${arch}/modules"
+    cp -r "$P4A_DIST_DIR/site-packages" "../src/main/assets/python/${arch}/site-packages"
 done

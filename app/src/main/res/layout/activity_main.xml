@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/factorial_hint"
         android:importantForAutofill="no"
-        android:inputType="number"
+        android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
