@@ -1,5 +1,7 @@
+jdk:
+  - openjdk11
 before_install:
-  - mkdir -p app/build/outputs/aar
-  - wget -O app/build/outputs/aar/library-android-release.aar https://github.com/jmir1/aniparse-android/releases/download/$VERSION/aniparse-android-$VERSION.aar
+  - mkdir -p library-android/build/outputs/aar
+  - wget -O library-android/build/outputs/aar/library-android-release.aar https://github.com/jmir1/aniparse-android/releases/download/$VERSION/aniparse-android-$VERSION.aar
 install:
   - ./gradlew -Pversion=$VERSION library-android:publishToMavenLocal
