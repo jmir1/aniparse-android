@@ -1,0 +1,3 @@
+before_install:
+  - mkdir -p app/build/outputs/aar
+  - wget -O app/build/outputs/aar/aniparse-android-release.aar https://github.com/jmir1/aniparse-android/releases/download/$VERSION/aniparse-android-$VERSION.aar

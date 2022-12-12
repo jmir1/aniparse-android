@@ -7,6 +7,7 @@ p4a clean_all
 rm -rf ../py-includes
 rm -rf ../src/main/jniLibs
 rm -rf ../src/main/assets/*/modules
+rm -rf ../src/main/assets/*/site-packages
 rm -rf ../src/main/assets/*/stdlib.zip
 
 # Remove build tools

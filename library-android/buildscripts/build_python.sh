@@ -21,7 +21,7 @@ fi
 p4a create --dist_name=python-android \
 --requirements=python3,aniparse \
 --blacklist-requirements=sqlite3,android,libffi,openssl \
---arch=x86_64 --arch=arm64-v8a
+--arch=x86 --arch=x86_64 --arch=armeabi-v7a --arch=arm64-v8a
 
 # Check if distribution was built correctly
 if [ ! -d "$HOME/.local/share/python-for-android/dists/python-android" ]; then
@@ -29,7 +29,7 @@ if [ ! -d "$HOME/.local/share/python-for-android/dists/python-android" ]; then
     exit 1
 fi
 
-ARCHS="x86_64 arm64-v8a"
+ARCHS="x86 x86_64 armeabi-v7a arm64-v8a"
 
 for arch in $ARCHS; do
     P4A_BUILD_DIR="$HOME/.local/share/python-for-android/build/other_builds/python3/${arch}__ndk_target_21/python3"
