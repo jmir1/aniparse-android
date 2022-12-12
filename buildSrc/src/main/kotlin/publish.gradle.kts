@@ -1,72 +1,26 @@
-import com.android.build.gradle.LibraryExtension
-import org.gradle.api.tasks.bundling.Jar
-
-/**
- * Precompiled script plugin from:
- * https://github.com/cortinico/kotlin-android-template/blob/master/buildSrc/src/main/kotlin/publish.gradle.kts
- *
- * The following plugin tasks care of setting up:
- * - Publishing to Maven Central and Sonatype Snapshots
- * - GPG Signing with in memory PGP Keys
- * - Javadoc/SourceJar are attached via AGP
- *
- * To use it just apply:
- *
- * plugins {
- *     publish
- * }
- *
- * To your build.gradle.kts.
- *
- * If you copy over this file in your project, make sure to copy it inside: buildSrc/src/main/kotlin/publish.gradle.kts.
- * Make sure to copy over also buildSrc/build.gradle.kts otherwise this plugin will fail to compile due to missing dependencies.
- */
 plugins {
     id("maven-publish")
-    id("signing")
 }
 
 publishing {
-    repositories {
-        maven {
-            name = "nexus"
-            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = "NEXUS_USERNAME".byProperty
-                password = "NEXUS_PASSWORD".byProperty
-            }
-        }
-        maven {
-            name = "snapshot"
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-            credentials {
-                username = "NEXUS_USERNAME".byProperty
-                password = "NEXUS_PASSWORD".byProperty
-            }
-        }
-    }
-
     publications {
         create<MavenPublication>("release") {
             afterEvaluate {
                 if (plugins.hasPlugin("com.android.library")) {
-                    from(components["release"])
+                    artifact("build/outputs/aar/library-android-release.aar")
                 } else {
                     from(components["java"])
                 }
             }
 
             pom {
-                if (!"USE_SNAPSHOT".byProperty.isNullOrBlank()) {
-                    version = "$version-SNAPSHOT"
-                }
-                description.set("A template for Kotlin Android projects")
-                url.set("https://github.com/jmir1/aniparseandroid/")
+                description.set("An android wrapper for aniparse")
+                url.set("https://github.com/jmir1/aniparse-android/")
 
                 licenses {
                     license {
-                        name.set("The MIT License")
-                        url.set("https://opensource.org/licenses/MIT")
+                        name.set("GPL-3.0")
+                        url.set("https://opensource.org/licenses/GPL-3.0")
                     }
                 }
                 developers {
@@ -76,27 +30,15 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git://github.com/jmir1/aniparseandroid.git")
-                    developerConnection.set("scm:git:ssh://github.com/jmir1/aniparseandroid.git")
-                    url.set("https://github.com/jmir1/aniparseandroid/")
+                    connection.set("scm:git:git://github.com/jmir1/aniparse-android.git")
+                    developerConnection.set("scm:git:ssh://github.com/jmir1/aniparse-android.git")
+                    url.set("https://github.com/jmir1/aniparse-android/")
                 }
                 issueManagement {
                     system.set("GitHub Issues")
-                    url.set("https://github.com/jmir1/aniparseandroid/issues")
+                    url.set("https://github.com/jmir1/aniparse-android/issues")
                 }
             }
-        }
-    }
-
-    val signingKey = "SIGNING_KEY".byProperty
-    val signingPwd = "SIGNING_PWD".byProperty
-    if (signingKey.isNullOrBlank() || signingPwd.isNullOrBlank()) {
-        logger.info("Signing Disable as the PGP key was not found")
-    } else {
-        logger.info("GPG Key found - Signing enabled")
-        signing {
-            useInMemoryPgpKeys(signingKey, signingPwd)
-            sign(publishing.publications["release"])
         }
     }
 }
