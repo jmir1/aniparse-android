@@ -58,7 +58,8 @@ class Parser {
          */
         fun parse(input: String): String? {
             if (!isStarted) throw InterpreterException()
-            return call("aniparse.parse('$input')")
+            val jsonString = call("json.dumps(aniparse.parse('$input'))")
+            return jsonString
         }
 
         /**

@@ -1,8 +1,10 @@
 version = LibraryAndroidCoordinates.LIBRARY_VERSION
 
 plugins {
+    val kotlinVersion = libs.versions.kotlin.get().toString()
     id("com.android.library")
     kotlin("android")
+    kotlin("plugin.serialization") version kotlinVersion
     id("maven-publish")
     publish
 }

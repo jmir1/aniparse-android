@@ -29,8 +29,8 @@ PyObject *local_dict;
 */
 JNIEXPORT jint JNICALL
 Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_startExternal(JNIEnv *env,
-                                                                                          jobject thiz,
-                                                                                          jstring path)
+                                                                                  jobject thiz,
+                                                                                  jstring path)
 {
     // Get the location of the python files
     const char *pypath = (*env)->GetStringUTFChars(env, path, NULL);
@@ -48,6 +48,7 @@ Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_startExterna
 
     // Import modules
     PyRun_SimpleString("import aniparse");
+    PyRun_SimpleString("import json");
 
     // Initialize dicts for evaluating stuff
     main_module = PyImport_AddModule("__main__");
@@ -66,7 +67,7 @@ Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_startExterna
  */
 JNIEXPORT jint JNICALL
 Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_stopExternal(JNIEnv *env,
-                                                                                         jobject thiz)
+                                                                                 jobject thiz)
 {
     Py_DECREF(local_dict);
     Py_DECREF(global_dict);
@@ -82,8 +83,8 @@ Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_stopExternal
  */
 JNIEXPORT jstring JNICALL
 Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_call(JNIEnv *env,
-                                                                                 jobject thiz,
-                                                                                 jstring payload)
+                                                                         jobject thiz,
+                                                                         jstring payload)
 {
     // Variables
     PyObject *codeObject;
