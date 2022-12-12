@@ -16,12 +16,7 @@ class Parser {
          * @return error code
          */
         fun start(context: Context): Int {
-            val assetExtractor = AssetExtractor(context.applicationContext)
-            val abi = Build.SUPPORTED_ABIS.first()
-            val path = "python/$abi"
-            assetExtractor.removeAssets(path)
-            assetExtractor.copyAssets(path)
-            val pythonPath = assetExtractor.getAssetsDataDir() + path
+            val pythonPath = context.applicationInfo.nativeLibraryDir
             val returnCode = startExternal(pythonPath)
             isStarted = returnCode == 0
             return returnCode

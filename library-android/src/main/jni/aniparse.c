@@ -40,7 +40,7 @@ Java_com_github_jmir1_aniparseandroid_library_Parser_00024Companion_startExterna
     snprintf(paths, sizeof(paths), "%s:%s/stdlib.zip:%s/modules:%s/site-packages", pypath, pypath, pypath, pypath);
 
     // Set Python paths
-    wchar_t *wchar_paths = Py_DecodeLocale(paths, NULL);
+    wchar_t *wchar_paths = Py_DecodeLocale(pypath, NULL);
     Py_SetPath(wchar_paths);
 
     // Initialize Python interpreter and logging

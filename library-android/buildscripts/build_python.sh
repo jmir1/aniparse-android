@@ -5,6 +5,8 @@
 
 # Export variables for p4a
 export ANDROIDSDK="$SDK_DIR/android-sdk-linux"
+export ANDROID_HOME=$ANDROIDSDK
+export ANDROID_SDK_ROOT=$ANDROIDSDK
 export ANDROIDNDK="$SDK_DIR/android-ndk-${v_ndk}"
 export ANDROIDAPI="$v_target_sdk"
 export NDKAPI="$v_minimum_sdk"

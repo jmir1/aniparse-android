@@ -1,4 +1,5 @@
-name: Publish Release
+name: Publish release
+
 on:
   push:
     tags:
@@ -6,43 +7,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
-    # remove this check when your secrets are setup and you're ready to publish
-    if: ${{ github.repository == 'cortinico/kotlin-android-template'}}
-    runs-on: [ubuntu-latest]
-    env:
-      GRADLE_OPTS: -Dorg.gradle.parallel=false
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
 
     steps:
-
-      - name: Checkout Repo
-        uses: actions/checkout@v3
-
-      - name: Setup Java
-        uses: actions/setup-java@v3
+      - uses: actions/checkout@v3
+      - name: Build the release artifacts
+        run: |
+          set -e
+          cd library-android/buildscripts
+          ./download.sh
+          ./build_python.sh
+          cd ../..
+          ./gradlew library-android:build
+      - name: Get tag name
+        run: |
+          set -x
+          echo "VERSION_TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
+      - name: Copy build artifacts
+        run: |
+          set -e
+          mv library-android/build/outputs/aar/library-android-release.aar aniparse-android-${{ env.VERSION_TAG }}.aar
+      - name: Create Release
+        uses: softprops/action-gh-release@v0.1.15
         with:
-          distribution: 'adopt'
-          java-version: '11'
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-
-      - name: Publish to Maven Local
-        run: ./gradlew publishToMavenLocal
-        env:
-          ORG_GRADLE_PROJECT_SIGNING_KEY: ${{ secrets.ORG_GRADLE_PROJECT_SIGNING_KEY }}
-          ORG_GRADLE_PROJECT_SIGNING_PWD: ${{ secrets.ORG_GRADLE_PROJECT_SIGNING_PWD }}
-
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'release-artifacts'
-          path: '~/.m2/repository/'
-
-      - name: Publish to the Snapshot Repository
-        run: ./gradlew publishReleasePublicationToNexusRepository
-        env:
-          ORG_GRADLE_PROJECT_SIGNING_KEY: ${{ secrets.ORG_GRADLE_PROJECT_SIGNING_KEY }}
-          ORG_GRADLE_PROJECT_SIGNING_PWD: ${{ secrets.ORG_GRADLE_PROJECT_SIGNING_PWD }}
-          ORG_GRADLE_PROJECT_NEXUS_USERNAME: ${{ secrets.ORG_GRADLE_PROJECT_NEXUS_USERNAME }}
-          ORG_GRADLE_PROJECT_NEXUS_PASSWORD: ${{ secrets.ORG_GRADLE_PROJECT_NEXUS_PASSWORD }}
+          tag_name: ${{ env.VERSION_TAG }}
+          name: aniparse-android ${{ env.VERSION_TAG }}
+          body: |
+            aniparse-android version ${{ env.VERSION_TAG }}
+          files: |
+            aniparse-android-${{ env.VERSION_TAG }}.aar

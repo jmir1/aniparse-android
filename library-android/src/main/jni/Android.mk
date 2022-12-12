@@ -6,7 +6,7 @@ JNILIBS_PATH := $(LOCAL_PATH)/../jniLibs
 # Build libaniparse.so
 include $(CLEAR_VARS)
 LOCAL_MODULE    := aniparse
-LOCAL_SRC_FILES := pybridge.c
+LOCAL_SRC_FILES := aniparse.c
 LOCAL_C_INCLUDES := $(INCLUDE_PATH)/$(TARGET_ARCH_ABI)/Include
 LOCAL_LDLIBS := -llog -lpython3.9
 LOCAL_LDFLAGS := -L$(JNILIBS_PATH)/$(TARGET_ARCH_ABI)
